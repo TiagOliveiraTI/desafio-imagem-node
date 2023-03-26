@@ -1,0 +1,40 @@
+version: '3'
+services:
+  node:
+    build: ./node
+    container_name: node
+    restart: always
+    command: npm start
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: example
+      DB_NAME: people
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - app-net
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - node
+    networks:
+      - app-net
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: people
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-net
+networks:
+  app-net:
+volumes:
+  db-data:
